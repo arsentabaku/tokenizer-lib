@@ -8,6 +8,7 @@ import {
   parseCloseParenthesis2,
   choice,
   parseOperator2,
+  choiceN,
 } from "./parsers";
 import { TokenTypes } from "./enums";
 
@@ -51,3 +52,12 @@ console.log("\n--- PARSE OPERATOR 2 (FUNCTIONAL) ---\n");
 console.log(parseOperator2("+42"));
 console.log(parseOperator2("-42"));
 console.log(parseOperator2("*42"));
+
+console.log("\n--- PARSE ANY TOKEN (FUNCTIONAL) ---\n");
+const parseAnyToken = choiceN([
+  parseNumber,
+  parseOperator,
+  parseOpenParenthesis,
+]);
+console.log(parseAnyToken("1 + 2"));
+console.log(parseAnyToken(")1 + 2("));

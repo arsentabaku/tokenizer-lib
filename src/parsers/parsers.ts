@@ -83,6 +83,19 @@ export const choice = (p1: Parser, p2: Parser): Parser => {
     return result1.success ? result1 : result2;
   };
 };
+
+export const choiceN = (parsers: Parser[]): Parser => {
+  return (input: string) => {
+    for (const parser of parsers) {
+      const result = parser(input);
+      if (result.success) {
+        return result;
+      }
+    }
+    return failure("No parser matched");
+  };
+};
+
 export const parseOperator2 = choice(
   parseCharacter("+", TokenTypes.OPERATOR),
   parseCharacter("-", TokenTypes.OPERATOR)
