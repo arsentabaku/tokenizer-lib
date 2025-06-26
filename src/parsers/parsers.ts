@@ -96,6 +96,22 @@ export const choiceN = (parsers: Parser[]): Parser => {
   };
 };
 
+export const zip = (p1: Parser, p2: Parser): Parser => {
+  return (input: string) => {
+    const result1 = p1(input);
+    if (!result1.success) {
+      return failure("First parser failed");
+    }
+
+    const result2 = p2(result1.rest);
+    if (!result2.success) {
+      return failure("Second parser failed");
+    }
+
+    return success([...result1.value, ...result2.value], result2.rest);
+  };
+};
+
 export const parseOperator2 = choice(
   parseCharacter("+", TokenTypes.OPERATOR),
   parseCharacter("-", TokenTypes.OPERATOR)

@@ -9,6 +9,7 @@ import {
   choice,
   parseOperator2,
   choiceN,
+  zip,
 } from "./parsers";
 import { TokenTypes } from "./enums";
 
@@ -37,23 +38,23 @@ console.log(choice(parseNumber, parseOperator)("1+2"));
 console.log(choice(parseNumber, parseOperator)("+2"));
 console.log(choice(parseNumber, parseOperator)("*2"));
 
-console.log("\n--- PARSE OPEN PARENTHESIS (FUNCTIONAL) ---\n");
+console.log("\n--- PARSE CHARACTER ---\n");
 const parseOpenPar = parseCharacter("(", TokenTypes.OPEN_PARENTHESIS);
 console.log(parseOpenPar("(2+3"));
 console.log(parseOpenPar("2+3"));
 
-console.log("\n--- PARSE OPEN PARENTHESIS 2 (FUNCTIONAL) ---\n");
+console.log("\n--- PARSE OPEN/CLOSE PARENTHESIS 2  ---\n");
 console.log(parseOpenParenthesis2("(2+3"));
 console.log(parseOpenParenthesis2("2+3"));
 console.log(parseCloseParenthesis2(")2+3"));
 console.log(parseCloseParenthesis2("(2+3"));
 
-console.log("\n--- PARSE OPERATOR 2 (FUNCTIONAL) ---\n");
+console.log("\n--- PARSE OPERATOR 2 ---\n");
 console.log(parseOperator2("+42"));
 console.log(parseOperator2("-42"));
 console.log(parseOperator2("*42"));
 
-console.log("\n--- PARSE ANY TOKEN (FUNCTIONAL) ---\n");
+console.log("\n--- PARSE CHOICE N ---\n");
 const parseAnyToken = choiceN([
   parseNumber,
   parseOperator,
@@ -61,3 +62,9 @@ const parseAnyToken = choiceN([
 ]);
 console.log(parseAnyToken("1 + 2"));
 console.log(parseAnyToken(")1 + 2("));
+
+console.log("\n--- PARSE ZIP ---\n");
+const parseNumberAndOperator = zip(parseNumber, parseOperator);
+console.log(parseNumberAndOperator("1+"));
+console.log(parseNumberAndOperator("+1"));
+console.log(parseNumberAndOperator("1+2+3"));
