@@ -116,3 +116,38 @@ export const parseOperator2 = choice(
   parseCharacter("+", TokenTypes.OPERATOR),
   parseCharacter("-", TokenTypes.OPERATOR)
 );
+
+const isEmpty: Parser = (input: string) => {
+  if (input == "") return success([], "");
+  else return failure("Not an empty string");
+};
+
+export function doUntil(parser: Parser): Parser {
+  return (input: string) => {
+    const emptyResult = isEmpty(input);
+    if (emptyResult.success) {
+      return emptyResult;
+    }
+
+    const result = parser(input);
+    if (!result.success) {
+      return failure("Parsing failed before reaching end of input");
+    }
+
+    const nextResult = doUntil(parser)(result.rest);
+    if (!nextResult.success) {
+      return failure("Parsing failed during sequence");
+    }
+
+    return success([...result.value, ...nextResult.value], nextResult.rest);
+  };
+}
+
+export const tokenizer = doUntil(
+  choiceN([
+    parseNumber,
+    parseOperator,
+    parseOpenParenthesis,
+    parseCloseParenthesis,
+  ])
+);

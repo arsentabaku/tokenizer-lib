@@ -10,6 +10,8 @@ import {
   parseOperator2,
   choiceN,
   zip,
+  doUntil,
+  tokenizer,
 } from "./parsers";
 import { TokenTypes } from "./enums";
 
@@ -68,3 +70,12 @@ const parseNumberAndOperator = zip(parseNumber, parseOperator);
 console.log(parseNumberAndOperator("1+"));
 console.log(parseNumberAndOperator("+1"));
 console.log(parseNumberAndOperator("1+2+3"));
+
+console.log("\n--- PARSE DO UNTIL ---\n");
+console.log(doUntil(choiceN([parseNumber, parseOperator]))("1+2"));
+console.log(doUntil(choiceN([parseNumber, parseOperator]))("1+("));
+
+console.log("\n--- PARSE TOKENIZER ---\n");
+console.log(tokenizer("1+(2-3)"));
+console.log(tokenizer("1+&3"));
+console.log(tokenizer("1+2a"));
