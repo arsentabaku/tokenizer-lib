@@ -74,3 +74,16 @@ export const parseCloseParenthesis2 = parseCharacter(
   ")",
   TokenTypes.CLOSE_PARENTHESIS
 );
+
+export const choice = (p1: Parser, p2: Parser): Parser => {
+  return (input: string) => {
+    const result1 = p1(input);
+    const result2 = p2(input);
+
+    return result1.success ? result1 : result2;
+  };
+};
+export const parseOperator2 = choice(
+  parseCharacter("+", TokenTypes.OPERATOR),
+  parseCharacter("-", TokenTypes.OPERATOR)
+);

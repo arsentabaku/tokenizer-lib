@@ -6,6 +6,8 @@ import {
   parseCharacter,
   parseOpenParenthesis2,
   parseCloseParenthesis2,
+  choice,
+  parseOperator2,
 } from "./parsers";
 import { TokenTypes } from "./enums";
 
@@ -29,6 +31,11 @@ console.log(parseCloseParenthesis(")"));
 console.log(parseCloseParenthesis("+ )"));
 console.log(parseCloseParenthesis("()"));
 
+console.log("\n--- CHOICE ---\n");
+console.log(choice(parseNumber, parseOperator)("1+2"));
+console.log(choice(parseNumber, parseOperator)("+2"));
+console.log(choice(parseNumber, parseOperator)("*2"));
+
 console.log("\n--- PARSE OPEN PARENTHESIS (FUNCTIONAL) ---\n");
 const parseOpenPar = parseCharacter("(", TokenTypes.OPEN_PARENTHESIS);
 console.log(parseOpenPar("(2+3"));
@@ -39,3 +46,8 @@ console.log(parseOpenParenthesis2("(2+3"));
 console.log(parseOpenParenthesis2("2+3"));
 console.log(parseCloseParenthesis2(")2+3"));
 console.log(parseCloseParenthesis2("(2+3"));
+
+console.log("\n--- PARSE OPERATOR 2 (FUNCTIONAL) ---\n");
+console.log(parseOperator2("+42"));
+console.log(parseOperator2("-42"));
+console.log(parseOperator2("*42"));
