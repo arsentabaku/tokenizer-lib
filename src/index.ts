@@ -12,70 +12,43 @@ import {
   zip,
   doUntil,
   tokenizer,
+  Parser,
 } from "./parsers";
 import { TokenTypes } from "./enums";
 
-console.log("\n--- PARSE NUMBER ---\n");
-console.log(parseNumber("123"));
-console.log(parseNumber("1 + 2"));
-console.log(parseNumber("+ 2"));
+function testSection(title: string, parser: Parser, inputs: string[]) {
+  console.log(`\n------ ${title.toUpperCase()} ------\n`);
 
-console.log("\n--- PARSE OPERATOR ---\n");
-console.log(parseOperator("+"));
-console.log(parseOperator("1 +"));
-console.log(parseOperator("- 2"));
+  for (const input of inputs) {
+    console.log(parser(input));
+  }
+}
 
-console.log("\n--- PARSE OPEN PARENTHESIS ---\n");
-console.log(parseOpenParenthesis("("));
-console.log(parseOpenParenthesis("+ ("));
-console.log(parseOpenParenthesis(")"));
+testSection("Number", parseNumber, ["123", "1 + 2", "+ 2"]);
+testSection("Operator", parseOperator, ["+", "1 +", "- 2"]);
+testSection("Open Parenthesis", parseOpenParenthesis, ["(", "+ (", ")"]);
+testSection("Close Parenthesis", parseCloseParenthesis, [")", "+ )", "()"]);
 
-console.log("\n--- PARSE CLOSE PARENTHESIS ---\n");
-console.log(parseCloseParenthesis(")"));
-console.log(parseCloseParenthesis("+ )"));
-console.log(parseCloseParenthesis("()"));
-
-console.log("\n--- CHOICE ---\n");
-console.log(choice(parseNumber, parseOperator)("1+2"));
-console.log(choice(parseNumber, parseOperator)("+2"));
-console.log(choice(parseNumber, parseOperator)("*2"));
-
-console.log("\n--- PARSE CHARACTER ---\n");
 const parseOpenPar = parseCharacter("(", TokenTypes.OPEN_PARENTHESIS);
-console.log(parseOpenPar("(2+3"));
-console.log(parseOpenPar("2+3"));
+testSection("Character", parseOpenPar, ["(2+3", "2+3"]);
 
-console.log("\n--- PARSE OPEN/CLOSE PARENTHESIS 2  ---\n");
-console.log(parseOpenParenthesis2("(2+3"));
-console.log(parseOpenParenthesis2("2+3"));
-console.log(parseCloseParenthesis2(")2+3"));
-console.log(parseCloseParenthesis2("(2+3"));
+testSection("Operator 2", parseOperator2, ["+42", "-42", "*42"]);
+testSection("Open Parenthesis 2", parseOpenParenthesis2, ["(2+3", "2+3"]);
+testSection("Close Parenthesis 2", parseCloseParenthesis2, [")2+3", "(2+3"]);
+testSection("Choice", choice(parseNumber, parseOperator), ["1+2", "+2", "(+"]);
 
-console.log("\n--- PARSE OPERATOR 2 ---\n");
-console.log(parseOperator2("+42"));
-console.log(parseOperator2("-42"));
-console.log(parseOperator2("*42"));
-
-console.log("\n--- PARSE CHOICE N ---\n");
 const parseAnyToken = choiceN([
   parseNumber,
   parseOperator,
   parseOpenParenthesis,
 ]);
-console.log(parseAnyToken("1 + 2"));
-console.log(parseAnyToken(")1 + 2("));
+testSection("Choice N", parseAnyToken, ["1 + 2", ")1 + 2("]);
 
-console.log("\n--- PARSE ZIP ---\n");
 const parseNumberAndOperator = zip(parseNumber, parseOperator);
-console.log(parseNumberAndOperator("1+"));
-console.log(parseNumberAndOperator("+1"));
-console.log(parseNumberAndOperator("1+2+3"));
+testSection("Zip", parseNumberAndOperator, ["1+", "+1", "1+2+3"]);
 
-console.log("\n--- PARSE DO UNTIL ---\n");
-console.log(doUntil(choiceN([parseNumber, parseOperator]))("1+2"));
-console.log(doUntil(choiceN([parseNumber, parseOperator]))("1+("));
-
-console.log("\n--- PARSE TOKENIZER ---\n");
-console.log(tokenizer("1+(2-3)"));
-console.log(tokenizer("1+&3"));
-console.log(tokenizer("1+2a"));
+testSection("Do Until", doUntil(choiceN([parseNumber, parseOperator])), [
+  "1+2",
+  "1+(",
+]);
+testSection("Tokenizer (Full)", tokenizer, ["1+(2-3)", "1+&3", "1+2a"]);
