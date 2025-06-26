@@ -1,6 +1,6 @@
 import { TokenTypes } from "../enums";
 import { success, failure } from "./result";
-import { Parser } from "./types";
+import { Parser, Token } from "./types";
 
 export const parseNumber: Parser = (input: string) => {
   const match = /^\d+/.exec(input);
@@ -53,3 +53,24 @@ export const parseCloseParenthesis: Parser = (input: string) => {
 
   return failure("Expected ')'");
 };
+
+export const parseCharacter = (
+  char: string,
+  tokenType: Token["type"]
+): Parser => {
+  return (input: string) => {
+    if (input[0] === char) {
+      return success([{ type: tokenType, value: input[0] }], input.slice(1));
+    }
+    return failure(`Expected ${char}`);
+  };
+};
+
+export const parseOpenParenthesis2 = parseCharacter(
+  "(",
+  TokenTypes.OPEN_PARENTHESIS
+);
+export const parseCloseParenthesis2 = parseCharacter(
+  ")",
+  TokenTypes.CLOSE_PARENTHESIS
+);
