@@ -10,9 +10,11 @@ import {
   parseOperator2,
   choiceN,
   zip,
+  Parser,
+  doUntilWithChoice,
   doUntil,
   tokenizer,
-  Parser,
+  tokenizerWithChoice,
 } from "./parsers";
 import { TokenTypes } from "./enums";
 
@@ -47,8 +49,24 @@ testSection("Choice N", parseAnyToken, ["1 + 2", ")1 + 2("]);
 const parseNumberAndOperator = zip(parseNumber, parseOperator);
 testSection("Zip", parseNumberAndOperator, ["1+", "+1", "1+2+3"]);
 
-testSection("Do Until", doUntil(choiceN([parseNumber, parseOperator])), [
-  "1+2",
-  "1+(",
-]);
-testSection("Tokenizer (Full)", tokenizer, ["1+(2-3)", "1+&3", "1+2a"]);
+const doUntilInput = ["1+2", "1+("];
+testSection(
+  "Do Until",
+  doUntil(choiceN([parseNumber, parseOperator])),
+  doUntilInput
+);
+
+testSection(
+  "Do Until (with Choice)",
+  doUntilWithChoice(
+    choice(
+      parseNumber,
+      choice(parseOperator, choice(parseOpenParenthesis, parseCloseParenthesis))
+    )
+  ),
+  doUntilInput
+);
+
+const tokenizerInput = ["1+(2-3)", "1+&3", "1+2a"];
+testSection("Tokenizer", tokenizer, tokenizerInput);
+testSection("Tokenizer (Choice)", tokenizerWithChoice, tokenizerInput);

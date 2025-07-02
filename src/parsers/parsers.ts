@@ -143,6 +143,18 @@ export function doUntil(parser: Parser): Parser {
   };
 }
 
+export function doUntilWithChoice(parser: Parser): Parser {
+  return choice(isEmpty, (input) => {
+    const step = zip(parser, doUntilWithChoice(parser))(input);
+
+    if (!step.success) {
+      return failure(step.reason);
+    }
+
+    return success(step.value, step.rest);
+  });
+}
+
 export const tokenizer = doUntil(
   choiceN([
     parseNumber,
@@ -150,4 +162,11 @@ export const tokenizer = doUntil(
     parseOpenParenthesis,
     parseCloseParenthesis,
   ])
+);
+
+export const tokenizerWithChoice = doUntilWithChoice(
+  choice(
+    parseNumber,
+    choice(parseOperator, choice(parseOpenParenthesis, parseCloseParenthesis))
+  )
 );
